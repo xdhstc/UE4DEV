@@ -32,6 +32,8 @@ void SCurveSlate::setPointArray(TArray<FVector2D> _pointArray, bool _isStatic, F
 {
 	//isStatic = _isStatic;
 	curveName = _curveName;
+	TArray<FString> stringArray;
+	curveName.ParseIntoArray(stringArray, TEXT("|"));
 	PointArray = _pointArray;
 	if (_isStatic)
 	{
@@ -43,7 +45,7 @@ void SCurveSlate::setPointArray(TArray<FVector2D> _pointArray, bool _isStatic, F
 	}
 	Color = normalColor;
 	//PointArray.Pop();
-	SetToolTipText(FText::FromString(curveName));
+	SetToolTipText(FText::FromString(stringArray.Last()));
 	lyId = 9;
 }
 

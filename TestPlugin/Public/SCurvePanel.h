@@ -50,29 +50,11 @@ public:
 	virtual FReply OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
 	virtual bool SupportsKeyboardFocus() const override { return true; }
-	 
-	//FReply myTest();
+
 	FReply testBtnClicked();
-
-
-	//FReply canvasMove(const FGeometry&, const FPointerEvent&);
-	//FReply canvasClick(const FGeometry&, const FPointerEvent&);
-	//FReply canvasRelease(const FGeometry&, const FPointerEvent&);
-
 	void loadJson(TMap<FString, TSharedPtr<FJsonValue>>);
 	void clearPanel();
-	/*
-	FReply textClick(const FGeometry&, const FPointerEvent&);
-	FReply textMove(const FGeometry&, const FPointerEvent&);
-	FReply textRelease(const FGeometry&, const FPointerEvent&);
 
-
-	void textEnter(const FGeometry&, const FPointerEvent&);
-	void textLeave(const FPointerEvent&);
-	void doCanvasMove(FVector2D);
-	void doCanvasMoveEnd(FVector2D);
-	void receiveMsg();
-	*/
 public:
 	//TSharedRef<SCanvas> ctlCanvas = SNew(SCanvas);
 	TSharedRef<SCanvas> ctlCanvas = SNew(SCanvas);
