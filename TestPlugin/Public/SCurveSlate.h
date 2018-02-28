@@ -70,6 +70,8 @@ private:
 
 	//bool isStatic;
 	FString curveName;
+	FColor staticColor;
+	FColor dynamicColor;
 	FColor normalColor;
 	FColor hoverColor;
 	FColor selectColor;

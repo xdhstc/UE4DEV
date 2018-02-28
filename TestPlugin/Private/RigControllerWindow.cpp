@@ -301,7 +301,7 @@ FReply RigControllerWindow::importBtnClicked()
 		//UE_LOG(LogTemp, Warning, TEXT("%s"), *FString::SanitizeFloat( ObjectPtr->GetNumberField(FString("age"))));
 		TMap<FString, TSharedPtr<FJsonValue>> jsonMap = ObjectPtr->Values;
 
-		curvePanel->initPanel(jsonMap);
+		curvePanel->loadJson(jsonMap);
 
 
 

@@ -48,7 +48,9 @@ public:
 	virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 	virtual FReply OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 	virtual FReply OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
-
+	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual bool SupportsKeyboardFocus() const override { return true; }
+	 
 	//FReply myTest();
 	FReply testBtnClicked();
 
@@ -57,14 +59,12 @@ public:
 	//FReply canvasClick(const FGeometry&, const FPointerEvent&);
 	//FReply canvasRelease(const FGeometry&, const FPointerEvent&);
 
-	void initPanel(TMap<FString, TSharedPtr<FJsonValue>>);
+	void loadJson(TMap<FString, TSharedPtr<FJsonValue>>);
 	void clearPanel();
+	/*
 	FReply textClick(const FGeometry&, const FPointerEvent&);
 	FReply textMove(const FGeometry&, const FPointerEvent&);
 	FReply textRelease(const FGeometry&, const FPointerEvent&);
-
-
-	//FReply curveClick(const FGeometry&, const FPointerEvent&, const SCurveSlate&);
 
 
 	void textEnter(const FGeometry&, const FPointerEvent&);
@@ -72,6 +72,7 @@ public:
 	void doCanvasMove(FVector2D);
 	void doCanvasMoveEnd(FVector2D);
 	void receiveMsg();
+	*/
 public:
 	//TSharedRef<SCanvas> ctlCanvas = SNew(SCanvas);
 	TSharedRef<SCanvas> ctlCanvas = SNew(SCanvas);
@@ -93,7 +94,9 @@ public:
 	FVector2D selectCurvePos;
 	FVector2D canvasPos;
 	FVector2D txtStartPos;
-	bool textSelected;
+	FVector2D canvasOffset;
+	//FSlateRenderTransform canvasTrans;
+	//bool textSelected;
 	WindowState winState;
 	//SCurveSlate* selectCurve;
 	float canvasScale;
@@ -106,6 +109,13 @@ private:
 	TArray<CurveData> curveDataArray;
 
 private:
+	void initParam();
+	//void initCanvas();
+	void setCanvasTrans();
+	//void offsetCanvas(FVector2D);
+	//void scaleCanvas(FScale2D);
+
+
 	void myDebug(FString);
 
 };

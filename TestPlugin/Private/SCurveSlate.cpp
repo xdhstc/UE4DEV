@@ -9,10 +9,12 @@
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 void SCurveSlate::Construct(const FArguments& InArgs)
 {
+	
 	Color = InArgs._Color;
 	ColorBlockSize = InArgs._Size;
-	normalColor = FColor(120, 120, 120, 255);
-	hoverColor = FColor(0, 0, 200, 255);
+	staticColor = FColor(120, 120, 120, 255);
+	dynamicColor = FColor(0, 0, 200, 255);
+	hoverColor = FColor(67, 255, 163);
 	selectColor = FColor(0, 200, 0, 255);
 	isHovered = false;
 	isSelected = false;
@@ -31,6 +33,15 @@ void SCurveSlate::setPointArray(TArray<FVector2D> _pointArray, bool _isStatic, F
 	//isStatic = _isStatic;
 	curveName = _curveName;
 	PointArray = _pointArray;
+	if (_isStatic)
+	{
+		normalColor = staticColor;
+	}
+	else
+	{
+		normalColor = dynamicColor;
+	}
+	Color = normalColor;
 	//PointArray.Pop();
 	SetToolTipText(FText::FromString(curveName));
 	lyId = 9;
