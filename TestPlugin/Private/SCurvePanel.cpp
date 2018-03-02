@@ -16,6 +16,7 @@ void SCurvePanel::initParam()
 	winState = WindowState::Normal;
 	panelMaxWidth = 1500.f;
 	panelMaxHeight = 980.f;
+	drawCanvasScale = 1.0f;
 	canvasScale = 1.0f;
 	canvasOffset = FVector2D(0.f, 0.f);
 }
@@ -27,10 +28,13 @@ void SCurvePanel::setCanvasTrans()
 
 void SCurvePanel::clearPanel()
 {
+	ctlCanvas->ClearChildren();
+	/*
 	for (int i = 0; i < curveList.Num(); i++)
 	{
 		ctlCanvas->RemoveSlot(curveList[i]);
 	}
+	*/
 	curveList.Empty();
 }
 
@@ -40,12 +44,14 @@ void SCurvePanel::Construct(const FArguments & args)
 		[
 			ctlCanvas
 		];
-	
+	//ctlCanvas->
 	testCurveSlot1 = &ctlCanvas->AddSlot();
 	testCurveSlot1->Position(FVector2D(350, 170));
 	testCurveSlot1->Size(FVector2D(200.0f, 80.0f));
 	testCurve1->setCanvasSlot(testCurveSlot1);
-
+	
+	//AsShared();
+	//testCurveSlot1->GetWidget(
 	TArray<FVector2D> vecList1;
 	vecList1.Add(FVector2D(0, 0));
 	vecList1.Add(FVector2D(30, 10));
@@ -84,13 +90,14 @@ void SCurvePanel::Construct(const FArguments & args)
 	testBtn->SetToolTipText(LOCTEXT("aaa", "4444444"));
 	
 	testBtn->SetOnClicked(FOnClicked::CreateRaw(this, &SCurvePanel::testBtnClicked));
+
 	testBtnSlot = &ctlCanvas->AddSlot();
 	testBtnSlot->HAlign(HAlign_Center);
 	testBtnSlot->VAlign(VAlign_Center);
 	testBtnSlot->Position(FVector2D(200, 40));
 	testBtnSlot->Size(FVector2D(100.0f, 40.0f));
 	testBtnSlot->AttachWidget(testBtn.Get().AsShared());
-
+	
 }
 
 
@@ -126,10 +133,43 @@ void SCurvePanel::loadJson(TMap<FString, TSharedPtr<FJsonValue>> _jsonMap)
 		}
 		curveXArray.Sort([](float A, float B) {return A < B; });
 		curveYArray.Sort([](float A, float B) {return A < B; });
-		curveData.offsetVector = FVector2D(curveXArray[0], curveYArray[0]);
+		curveData.vertexOffsetVector = FVector2D(curveXArray[0], curveYArray[0]);
 		curveData.size = FVector2D(curveXArray.Last() - curveXArray[0], curveYArray.Last() - curveYArray[0]);
+		curveData.curveOffsetVector = FVector2D(0.f, 0.f);
+
+
+
+
+		TSharedPtr< FJsonObject > transLimitDictPtr = contentPtr->GetObjectField(FString("trans_limit_dict"));
+		TMap<FString, TSharedPtr<FJsonValue>> transLimitDict = transLimitDictPtr->Values;
+		if (transLimitDict.Num() > 0)
+		{
+			curveData.xLocked = transLimitDict[FString("xLocked")]->AsBool();
+			curveData.yLocked = transLimitDict[FString("yLocked")]->AsBool();
+			curveData.zLocked = transLimitDict[FString("zLocked")]->AsBool();
+			curveData.xMin = transLimitDict[FString("xMin")]->AsNumber();
+			curveData.xMax = transLimitDict[FString("xMax")]->AsNumber();
+			curveData.yMin = transLimitDict[FString("yMin")]->AsNumber();
+			curveData.yMax = transLimitDict[FString("yMax")]->AsNumber();
+			curveData.zMin = transLimitDict[FString("zMin")]->AsNumber();
+			curveData.zMax = transLimitDict[FString("zMax")]->AsNumber();
+
+
+
+
+		}
+
+		
+
+
+
+
 		curveDataArray.Add(curveData);
 	}
+
+	
+
+
 
 	xAllArray.Sort([](float A, float B) {return A < B; });
 	yAllArray.Sort([](float A, float B) {return A < B; });
@@ -141,8 +181,8 @@ void SCurvePanel::loadJson(TMap<FString, TSharedPtr<FJsonValue>> _jsonMap)
 
 	float xScale = panelMaxWidth / (xMax - xMin);
 	float yScale = panelMaxHeight / (yMax - yMin);
-	float tmpCanvasScale = xScale < yScale ? xScale : yScale;
-
+	//float tmpCanvasScale = xScale < yScale ? xScale : yScale;
+	drawCanvasScale = xScale < yScale ? xScale : yScale;
 	FVector2D AllOffsetVector = FVector2D(-xMin, -yMin);
 
 	for (int i = 0; i < curveDataArray.Num(); i++)
@@ -150,22 +190,28 @@ void SCurvePanel::loadJson(TMap<FString, TSharedPtr<FJsonValue>> _jsonMap)
 		TArray<FVector2D> vexList;
 		for (int j = 0; j < curveDataArray[i].pointArray.Num(); j++)
 		{
-			vexList.Add((curveDataArray[i].pointArray[j] - curveDataArray[i].offsetVector)*tmpCanvasScale);
+			vexList.Add((curveDataArray[i].pointArray[j] - curveDataArray[i].vertexOffsetVector)*drawCanvasScale);
 		}
 
 
 		SCanvas::FSlot *myCurveSlot = &ctlCanvas->AddSlot();
-		myCurveSlot->Position((curveDataArray[i].offsetVector + AllOffsetVector)*tmpCanvasScale);
+		myCurveSlot->Position((curveDataArray[i].vertexOffsetVector + AllOffsetVector)*drawCanvasScale);
 		if (!curveDataArray[i].isStatic)
 		{
-			myCurveSlot->Size(curveDataArray[i].size*tmpCanvasScale);
+			myCurveSlot->Size(curveDataArray[i].size*drawCanvasScale);
 		}
-		
+
 		TSharedRef<SCurveSlate> myCurve = SNew(SCurveSlate);
 		myCurve->setCanvasSlot(myCurveSlot);
 		myCurve->setPointArray(vexList, curveDataArray[i].isStatic, curveDataArray[i].name);
-		myCurve->SetRenderTransform(FSlateRenderTransform(FVector2D(0, 0)));
+		if (!curveDataArray[i].isStatic)
+		{
+			myCurve->setMoveAttr(curveDataArray[i].xLocked, curveDataArray[i].yLocked, curveDataArray[i].zLocked, curveDataArray[i].xMin, curveDataArray[i].xMax, curveDataArray[i].yMin, curveDataArray[i].yMax, curveDataArray[i].zMin, curveDataArray[i].zMax, curveDataArray[i].curveOffsetVector);
+		}
+		//myCurve->SetRenderTransform(FSlateRenderTransform(curveDataArray[i].curveOffsetVector));
+		//myCurve->parentPanel = this;
 		myCurveSlot->AttachWidget(myCurve.Get().AsShared());
+		curveDataArray[i].curve = &myCurve;
 		curveList.Add(myCurve);
 	}
 }
@@ -203,7 +249,8 @@ FReply SCurvePanel::OnMouseButtonDown(const FGeometry & MyGeometry, const FPoint
 					selectCurve = &curveList[i];
 					selectCurve->Get().isSelected = true;
 					clickPos = mouseEvent.GetScreenSpacePosition();
-					selectCurvePos = selectCurve->Get().GetRenderTransform()->GetTranslation();
+					//selectCurvePos = selectCurve->Get().GetRenderTransform()->GetTranslation();
+					selectCurvePos = selectCurve->Get().curveOffsetVector;
 					return FReply::Handled();;
 				}
 			}
@@ -235,6 +282,8 @@ FReply SCurvePanel::OnMouseButtonUp(const FGeometry & MyGeometry, const FPointer
 	case CurveMove:
 		UE_LOG(LogTemp, Warning, TEXT("%s"),*selectCurve->Get().canvasSlot->PositionAttr.Get().ToString());
 		selectCurve->Get().isSelected = false;
+		selectCurve->Get().setCurveActive(false);
+		selectCurve->Get().moveCuveEnd();
 		winState = WindowState::Normal;
 		break;
 
@@ -259,7 +308,11 @@ FReply SCurvePanel::OnMouseMove(const FGeometry & MyGeometry, const FPointerEven
 		break;
 
 	case CurveMove:
-		selectCurve->Get().SetRenderTransform(FSlateRenderTransform(selectCurvePos+(mouseEvent.GetScreenSpacePosition() - clickPos)/canvasScale));
+		selectCurve->Get().moveCurveStart(selectCurvePos, clickPos, mouseEvent.GetScreenSpacePosition(), canvasScale, drawCanvasScale);
+
+		//selectCurve->Get().SetRenderTransform(FSlateRenderTransform(selectCurvePos+(mouseEvent.GetScreenSpacePosition() - clickPos)/canvasScale));
+
+		//myDebug(((mouseEvent.GetScreenSpacePosition() - clickPos) / (canvasScale*drawCanvasScale)).ToString());
 		break;
 
 	case CanvasMove:

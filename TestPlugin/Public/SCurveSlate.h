@@ -4,16 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Widgets/SCompoundWidget.h"
-
-
 #include "CoreMinimal.h"
 #include "Misc/Attribute.h"
 #include "Input/Reply.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/SLeafWidget.h"
 #include "Widgets/SCanvas.h"
-
+#include "SCurvePanel.h"
 #include "Json.h"
+//#include "SCurvePanel.h"
+
+
 class FPaintArgs;
 class FSlateWindowElementList;
 
@@ -51,13 +52,21 @@ public:
 	void setCanvasSlot( SCanvas::FSlot*);
 
 	void setPointArray(TArray<FVector2D>,bool,FString);
+	
+	void setMoveAttr(bool _xLocked, bool _yLocked, bool _zLocked, float _xMin, float _xMax, float _yMin, float _yMax, float _zMin, float _zMax,FVector2D _curveOffsetVector);
+
+	void setCurveTrans();
+	void setCurveActive(bool _isActive);
+	void moveCurveStart(FVector2D _canvasBeforeVec,FVector2D _mouseDownVec,FVector2D _mouseCurrentVec,float _canvasScale,float _drawCanvasScale);
+	void moveCuveEnd();
 
 
 public:
 	SCanvas::FSlot* canvasSlot;
 	bool isHovered;
 	bool isSelected;
-
+	FVector2D curveOffsetVector;
+	 
 private:
 
 
@@ -68,6 +77,7 @@ private:
 
 	virtual FVector2D ComputeDesiredSize(float) const override;
 
+private:
 	//bool isStatic;
 	FString curveName;
 	FColor staticColor;
@@ -76,10 +86,32 @@ private:
 	FColor hoverColor;
 	FColor selectColor;
 
-private:
+
 
 	TAttribute< FLinearColor > Color;
 	TArray<FVector2D> PointArray;
 	TAttribute<FVector2D> ColorBlockSize;
 	int lyId;
+
+
+	bool xLocked;
+	bool yLocked;
+	bool zLocked;
+	float xMin;
+	float xMax;
+	float yMin;
+	float yMax;
+	float zMin;
+	float zMax;
+
+	//float realMouseXMax;
+	//float realMouseXMin;
+	//float realMouseYMax;
+	//float realMouseYMin;
+
+
+	FVector2D contorllOffsetVector;
+
+	FVector2D compareVec;
+	FVector2D realCtlOffset;
 };

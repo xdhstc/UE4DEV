@@ -19,15 +19,24 @@ struct CurveData
 {
 	FString name;
 	TArray<FVector2D> pointArray;
-	FVector2D offsetVector;
-	//float xMin;
-	//float yMin;
+	FVector2D vertexOffsetVector;
+	FVector2D curveOffsetVector;
 	FVector2D size;
-	//float width;
-	//float height;
 	bool isStatic;
+	bool xLocked;
+	bool yLocked;
+	bool zLocked;
+	float xMin;
+	float xMax;
+	float yMin;
+	float yMax;
+	float zMin;
+	float zMax;
+	TSharedRef<SCurveSlate>* curve;
 
+	//TSharedRef<SCurveSlate> curve;
 };
+
 
 
 
@@ -50,6 +59,14 @@ public:
 	virtual FReply OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
 	virtual bool SupportsKeyboardFocus() const override { return true; }
+
+	
+	
+
+	//void OnCurveEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent);
+	//void OnCurveEnter1(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent, FString&);
+	//FReply clickTest(FString myS);
+
 
 	FReply testBtnClicked();
 	void loadJson(TMap<FString, TSharedPtr<FJsonValue>>);
@@ -81,6 +98,7 @@ public:
 	//bool textSelected;
 	WindowState winState;
 	//SCurveSlate* selectCurve;
+	float drawCanvasScale;
 	float canvasScale;
 	float panelMaxWidth;
 	float panelMaxHeight;
